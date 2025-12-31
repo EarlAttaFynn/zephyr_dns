@@ -1,0 +1,89 @@
+services:
+  # -------------------------------------------------------
+  # 1. Gluetun (The Secure Gateway)
+  # -------------------------------------------------------
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports:
+      - "127.0.0.1:5335:5335/tcp" # DNS for AdGuard
+      - "127.0.0.1:5335:5335/udp"
+      - "8888:8888/tcp"           # HTTP Proxy
+      #- "41641:41641/udp"       # OPTIONAL: Only needed if you want Direct Connections to Tailscale (bypass relays)
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv6.conf.all.disable_ipv6=1
+      # Pi 5 Performance Tuning (Increase buffer sizes for high speed)
+      # - net.core.rmem_max=4194304
+      # - net.core.wmem_max=4194304
+    environment:
+      - VPN_SERVICE_PROVIDER=protonvpn
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=real-goes-here
+      - WIREGUARD_ADDRESSES=10.2.0.2/32
+      - FIREWALL_OUTBOUND_SUBNETS=192.168.0.0/24
+      - VPN_PORT_FORWARDING=on
+      # --- CRITICAL FOR TAILSCALE ---
+      # Allow Tailscale's UDP traffic to leave the container
+      - FIREWALL_VPN_INPUT_PORTS=41641
+      - HTTPPROXY=on
+    volumes:
+      - ./gluetun:/gluetun
+    restart: always
+  # -------------------------------------------------------
+  # 2. Tailscale (The Secure Exit Node)
+  # -------------------------------------------------------
+  tailnet:
+    image: tailscale/tailscale:latest
+    container_name: tailnet
+    network_mode: "service:gluetun"
+    environment:
+      - tskey-auth-key-goes-here
+      - TS_EXTRA_ARGS=--advertise-exit-node --advertise-routes=192.168.0.0/24 --accept-dns=false
+      - TS_HOSTNAME=ts-zephyr
+      - TS_STATE_DIR=/var/lib/tailscale
+      # Revert to Userspace for stability inside Sidecar
+      - TS_USERSPACE=true
+      - TS_PORT=41641
+    volumes:
+      - ./tailscale-data:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun
+    restart: unless-stopped
+    depends_on:
+      gluetun:
+        condition: service_healthy
+  # -------------------------------------------------------
+  # 3. Unbound (The Secure Resolver)
+  # -------------------------------------------------------
+  unbound:
+    image: madnuttah/unbound:latest
+    container_name: unbound
+    # Attach to Gluetun Network
+    network_mode: "service:gluetun"
+    environment:
+      - TZ=America/New_York
+      - UNBOUND_UID=1000
+      - UNBOUND_GID=1000
+    volumes:
+      # Mount entire folder so config + zones are available
+      - ./unbound:/etc/unbound
+    restart: unless-stopped
+    depends_on:
+      gluetun:
+        condition: service_healthy
+  # -------------------------------------------------------
+  # 4. AdGuard Home (The Controller)
+  # -------------------------------------------------------
+  adguard:
+    image: adguard/adguardhome:latest
+    container_name: adguard
+    # Host mode: Sees real Client IPs on your LAN
+    network_mode: host
+    volumes:
+      - ./adguard_work:/opt/adguardhome/work
+      - ./adguard_conf:/opt/adguardhome/conf
+    restart: unless-stopped

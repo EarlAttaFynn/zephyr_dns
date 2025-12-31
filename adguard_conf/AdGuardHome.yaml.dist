@@ -6,7 +6,7 @@ http:
   session_ttl: 720h
 users:
   - name: <username>
-    password: <password-hash>
+    password: <password>
 auth_attempts: 5
 block_auth_min: 15
 http_proxy: ""
@@ -64,8 +64,7 @@ dns:
   upstream_timeout: 10s
   private_networks: []
   use_private_ptr_resolvers: true
-  local_ptr_upstreams:
-    - 192.168.0.1
+  local_ptr_upstreams: []
   use_dns64: false
   dns64_prefixes: []
   serve_http3: false
@@ -110,7 +109,7 @@ filters:
     url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_2.txt
     name: AdAway Default Blocklist
     id: 2
-  - enabled: true
+  - enabled: false
     url: https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn/hosts
     name: Steven Black Unified+fakenews+porn+gambling
     id: 1765337701
@@ -142,11 +141,11 @@ filters:
     url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_71.txt
     name: HaGeZi's DNS Rebind Protection
     id: 1765337708
-  - enabled: true
+  - enabled: false
     url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_54.txt
     name: HaGeZi's DynDNS Blocklist
     id: 1765337709
-  - enabled: true
+  - enabled: false
     url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_52.txt
     name: HaGeZi's Encrypted DNS/VPN/TOR/Proxy Bypass
     id: 1765337710
@@ -219,7 +218,127 @@ filtering:
   blocked_services:
     schedule:
       time_zone: UTC
-    ids: []
+      sun:
+        start: 16h15m
+        end: 19h30m
+      mon:
+        start: 16h15m
+        end: 19h30m
+      tue:
+        start: 16h15m
+        end: 19h30m
+      wed:
+        start: 16h15m
+        end: 19h30m
+      thu:
+        start: 16h15m
+        end: 19h30m
+      fri:
+        start: 16h15m
+        end: 19h30m
+      sat:
+        start: 16h15m
+        end: 19h30m
+    ids:
+      - 4chan
+      - 500px
+      - 9gag
+      - activision_blizzard
+      - aliexpress
+      - amazon_streaming
+      - amino
+      - apple_streaming
+      - battle_net
+      - betano
+      - betfair
+      - betway
+      - bigo_live
+      - bilibili
+      - blaze
+      - blizzard_entertainment
+      - bluesky
+      - canais_globo
+      - chatgpt
+      - claro
+      - clubhouse
+      - coolapk
+      - crunchyroll
+      - dailymotion
+      - deezer
+      - directvgo
+      - discord
+      - discoveryplus
+      - disneyplus
+      - douban
+      - ebay
+      - electronic_arts
+      - epic_games
+      - espn
+      - facebook
+      - fifa
+      - globoplay
+      - gog
+      - hbomax
+      - hulu
+      - iheartradio
+      - instagram
+      - iqiyi
+      - kook
+      - lazada
+      - leagueoflegends
+      - line
+      - linkedin
+      - lionsgateplus
+      - looke
+      - mail_ru
+      - mastodon
+      - mercado_libre
+      - minecraft
+      - nebula
+      - netflix
+      - nintendo
+      - odysee
+      - ok
+      - onlyfans
+      - origin
+      - paramountplus
+      - peacock_tv
+      - pinterest
+      - playstation
+      - plenty_of_fish
+      - plex
+      - pluto_tv
+      - qq
+      - rakuten_viki
+      - reddit
+      - riot_games
+      - roblox
+      - rockstar_games
+      - samsung_tv_plus
+      - shein
+      - shopee
+      - snapchat
+      - soundcloud
+      - spotify_video
+      - temu
+      - tidal
+      - tiktok
+      - tinder
+      - tumblr
+      - twitch
+      - twitter
+      - ubisoft
+      - valorant
+      - vimeo
+      - vk
+      - voot
+      - wargaming
+      - weibo
+      - wizz
+      - xboxlive
+      - xiaohongshu
+      - yy
+      - zhihu
   protection_disabled_until: null
   safe_search:
     enabled: false

@@ -1,2 +1,13 @@
+# compose.yml has env var secrets
+docker-compose.yml
+# gluetun has server keys, certs, etc
+gluetun/
+# Tailscale Identity
+tailscale-data/
+# AdGuard Runtime Config
 AdGuardHome.yaml
 adguard_work/
+# Unbound Keys & Logs
+unbound/*.key
+unbound/*.pem
+unbound/*.log
